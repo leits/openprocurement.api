@@ -600,6 +600,9 @@ class LotValue(Model):
 view_bid_role = (blacklist('owner_token', 'owner') + schematics_default_role)
 Administrator_bid_role = whitelist('tenderers')
 
+encrypt_auction = whitelist('value', 'lotValues', 'id', 'date', 'parameters')
+encrypt_qualification = view_bid_role + blacklist('value', 'lotValues', 'id', 'date', 'parameters', 'status')
+
 
 class Bid(Model):
     class Options:
@@ -620,6 +623,8 @@ class Bid(Model):
             'complete': view_bid_role,
             'unsuccessful': view_bid_role,
             'cancelled': view_bid_role,
+            'encrypt_active.auction': encrypt_auction,
+            'encrypt_active.qualification': encrypt_qualification,
         }
 
     def __local_roles__(self):
@@ -1109,6 +1114,9 @@ auction_role = (blacklist('owner_token', '_attachments', 'revisions', 'bids', 'n
 chronograph_role = whitelist('auctionPeriod', 'lots', 'next_check')
 chronograph_view_role = whitelist('status', 'enquiryPeriod', 'tenderPeriod', 'auctionPeriod', 'awardPeriod', 'awards', 'lots', 'doc_id', 'submissionMethodDetails', 'mode', 'numberOfBids', 'complaints')
 Administrator_role = whitelist('status', 'mode', 'procuringEntity', 'auctionPeriod', 'lots')
+
+encrypt_auction = whitelist('value', 'lotValues', 'id', 'date', 'parameters')
+encrypt_qualification = view_bid_role + blacklist('value', 'lotValues', 'id', 'date', 'parameters', 'status')
 
 
 @implementer(ITender)

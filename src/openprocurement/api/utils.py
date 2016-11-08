@@ -361,6 +361,14 @@ def apply_patch(request, data=None, save=True, src=None):
             return save_tender(request)
 
 
+def split_bid(bid):
+    parts = {}
+    for role in bid.Options.roles:
+        if role.startswith('encrypt_'):
+            parts[role.split('encrypt_')[-1]] = bid.serialize(role)
+    return parts
+
+
 def cleanup_bids_for_cancelled_lots(tender):
     cancelled_lots = [i.id for i in tender.lots if i.status == 'cancelled']
     if cancelled_lots:

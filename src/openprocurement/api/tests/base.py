@@ -564,3 +564,23 @@ class DryRunTenderBaseWebTest(BaseTenderWebTest):
         self.db.save(data)
         if self.initial_status != data['status']:
             self.set_status(self.initial_status)
+
+class EncryptionTenderWebTest(BaseTenderWebTest):
+
+    @classmethod
+    def setUpClass(cls):
+        while True:
+            try:
+                cls.dryrun = webtest.TestApp("config:tests_dry_run.ini", relative_to=cls.relative_to)
+            except:
+                pass
+            else:
+                break
+        cls.dryrun.RequestClass = PrefixedRequestClass
+        super(EncryptionTenderWebTest, cls).setUpClass()
+
+    def setUp(self):
+        super(EncryptionTenderWebTest, self).setUp()
+        self.dryrun.app.registry.db = self.db
+        # self.dryrun.authorization = ('Basic', ('token', ''))
+        self.dryrun.authorization = ('Basic', ('broker', ''))

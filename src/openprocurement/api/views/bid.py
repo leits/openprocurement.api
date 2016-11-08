@@ -8,6 +8,7 @@ from openprocurement.api.utils import (
     json_view,
     context_unpack,
     APIResource,
+    split_bid,
 )
 from openprocurement.api.validation import (
     validate_bid_data,
@@ -122,12 +123,15 @@ class TenderBidResource(APIResource):
                         extra=context_unpack(self.request, {'MESSAGE_ID': 'tender_bid_create'}, {'bid_id': bid.id}))
             self.request.response.status = 201
             self.request.response.headers['Location'] = self.request.route_url('Tender Bids', tender_id=tender.id, bid_id=bid['id'])
-            return {
+            response = {
                 'data': bid.serialize('view'),
                 'access': {
                     'token': bid.owner_token
                 }
             }
+            if self.request.registry.dry_run:
+                response['parts'] = split_bid(self.request.validated['bid'])
+            return response
 
     @json_view(permission='view_tender')
     def collection_get(self):
